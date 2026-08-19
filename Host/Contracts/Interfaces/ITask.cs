@@ -8,9 +8,7 @@ namespace Contracts.Interfaces;
 public interface ITask
 {
     string Id { get; }
-
     string Name { get; }
-
     string Description { get; }
 
     IReadOnlyList<TaskParameter> Parameters { get; }
@@ -18,5 +16,6 @@ public interface ITask
     Task<TaskResult> ExecuteAsync(
         Dictionary<string, string> parameters,
         CancellationToken cancellationToken,
-        IProgress<double>? progress = null);
+        IProgress<double>? progress = null,
+        IProgress<string>? log = null);
 }

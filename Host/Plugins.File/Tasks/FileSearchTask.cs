@@ -26,6 +26,7 @@ public class FileSearchTask : ITask
                 Description = "Например: *.txt",
                 IsRequired = true
             },
+
             new TaskParameter
             {
                 Name = "directory",
@@ -38,11 +39,15 @@ public class FileSearchTask : ITask
     public async Task<TaskResult> ExecuteAsync(
         Dictionary<string, string> parameters,
         CancellationToken cancellationToken,
-        IProgress<double>? progress = null)
+        IProgress<double>? progress = null,
+        IProgress<string>? log = null)
     {
+
         if (!parameters.TryGetValue("mask", out var mask) ||
             string.IsNullOrWhiteSpace(mask))
         {
+            log?.Report("Не указана маска файлов.");
+
             return new TaskResult
             {
                 IsSuccess = false,
@@ -53,6 +58,8 @@ public class FileSearchTask : ITask
         if (!parameters.TryGetValue("directory", out var directory) ||
             string.IsNullOrWhiteSpace(directory))
         {
+            log?.Report("Не указана папка для поиска.");
+
             return new TaskResult
             {
                 IsSuccess = false,
@@ -62,6 +69,8 @@ public class FileSearchTask : ITask
 
         if (!Directory.Exists(directory))
         {
+            log?.Report($"Папка не существует: {directory}");
+
             return new TaskResult
             {
                 IsSuccess = false,
@@ -71,6 +80,16 @@ public class FileSearchTask : ITask
 
         try
         {
+            log?.Report($"Начат поиск файлов.");
+            log?.Report($"Маска: {mask}");
+            log?.Report($"Папка: {directory}");
+
+            progress?.Report(0);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            log?.Report("Поиск файлов в директории...");
+
             var files = await Task.Run(
                 () => Directory
                     .EnumerateFiles(
@@ -79,6 +98,39 @@ public class FileSearchTask : ITask
                         SearchOption.AllDirectories)
                     .ToList(),
                 cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            log?.Report($"Поиск завершён. Найдено файлов: {files.Count}");
+
+            if (files.Count == 0)
+            {
+                progress?.Report(100);
+                log?.Report("Подходящих файлов не найдено.");
+
+                return new TaskResult
+                {
+                    IsSuccess = true,
+                    Message = "Файлы не найдены.",
+                    Data = files
+                };
+            }
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                string file = files[i];
+                log?.Report($"Найден файл: {file}");
+
+                double percentage =
+                    (i + 1) * 100.0 / files.Count;
+
+                progress?.Report(percentage);
+
+                await Task.Yield();
+            }
+
+            progress?.Report(100);
+            log?.Report("Задача успешно завершена.");
 
             return new TaskResult
             {
@@ -89,6 +141,8 @@ public class FileSearchTask : ITask
         }
         catch (OperationCanceledException)
         {
+            log?.Report("Поиск был отменён.");
+
             return new TaskResult
             {
                 IsSuccess = false,
@@ -97,6 +151,8 @@ public class FileSearchTask : ITask
         }
         catch (Exception ex)
         {
+            log?.Report($"Ошибка поиска: {ex.Message}");
+
             return new TaskResult
             {
                 IsSuccess = false,
