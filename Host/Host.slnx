@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Contracts/Contracts.csproj" />
+  <Project Path="Host/Host.csproj" />
+  <Project Path="Plugins.Command/Plugins.Command.csproj" />
+  <Project Path="Plugins.File/Plugins.File.csproj" />
+</Solution>

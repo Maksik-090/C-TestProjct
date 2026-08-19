@@ -1,0 +1,200 @@
+﻿<Window x:Class="Host.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Модульное приложение"
+        Width="765"
+        Height="750"
+        MinWidth="900"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel>
+
+        <!--МЕНЮ-->
+        <Menu DockPanel.Dock="Top">
+
+            <MenuItem Header="_Файл">
+                <MenuItem Header="Выход"
+                          Click="ExitMenuItem_Click"/>
+            </MenuItem>
+
+            <MenuItem Header="_Плагины">
+                <MenuItem Header="Обновить список"
+                          Click="ReloadPluginsMenuItem_Click"/>
+            </MenuItem>
+
+            <MenuItem Header="_Вид">
+                <MenuItem Header="Очистить историю"
+                          Click="ClearHistoryMenuItem_Click"/>
+            </MenuItem>
+
+            <MenuItem Header="_Справка">
+                <MenuItem Header="О программе"
+                          Click="AboutMenuItem_Click"/>
+            </MenuItem>
+
+        </Menu>
+
+
+        <!--СТРОКА СОСТОЯНИЯ-->
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusText"
+                           Text="Готово"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="PluginsCountText"
+                           Text="Плагинов: 0"/>
+            </StatusBarItem>
+            <Separator/>
+
+            <StatusBarItem>
+                <TextBlock x:Name="TasksCountText"
+                           Text="Задач: 0"/>
+            </StatusBarItem>
+
+        </StatusBar>
+
+
+        <!--ОСНОВНАЯ ОБЛАСТЬ-->
+
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+                <!--Доступные задачи-->
+                <RowDefinition Height="220"/>
+                <!--Параметры-->
+                <RowDefinition Height="220"/>
+                <!--Запуск-->
+                <RowDefinition Height="55"/>
+                <!-- Выполнение -->
+                <RowDefinition Height="*"/>
+
+            </Grid.RowDefinitions>
+
+
+            <!---->
+            <!--ДОСТУПНЫЕ ЗАДАЧИ-->
+            <!---->
+            <GroupBox Grid.Row="0"
+                      Header="Доступные задачи"
+                      Margin="0,0,0,6">
+                <DataGrid x:Name="TasksGrid"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          SelectionChanged="TasksGrid_SelectionChanged"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Задача"
+                                            Binding="{Binding Name}"
+                                            Width="2*"/>
+
+                        <DataGridTextColumn Header="Плагин"
+                                            Binding="{Binding PluginName}"
+                                            Width="180"/>
+
+                        <DataGridTextColumn Header="Описание"
+                                            Binding="{Binding Description}"
+                                            Width="3*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+
+            <!---->
+            <!--ПАРАМЕТРЫ-->
+            <!---->
+            <GroupBox Grid.Row="1"
+                      Header="Параметры выбранной задачи"
+                      Margin="0,0,0,6">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+
+                    <Grid x:Name="ParametersPanel"
+                          Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </ScrollViewer>
+            </GroupBox>
+
+
+            <!---->
+            <!--КНОПКИ-->
+            <!---->
+            <Border Grid.Row="2"
+                    BorderBrush="#CCCCCC"
+                    BorderThickness="1"
+                    Padding="5"
+                    Margin="0,0,0,6">
+
+                <StackPanel Orientation="Horizontal">
+
+                    <Button x:Name="RunButton"
+                            Content="Запустить"
+                            Width="110"
+                            Height="32"
+                            Margin="0,0,6,0"
+                            Click="RunButton_Click"
+                            IsEnabled="False"/>
+
+                    <Button x:Name="CancelButton"
+                            Content="Отменить"
+                            Width="110"
+                            Height="32"
+                            Click="CancelButton_Click"
+                            IsEnabled="False"/>
+
+                    <TextBlock x:Name="SelectedTaskText"
+                               VerticalAlignment="Center"
+                               Margin="20,0,0,0"
+                               Text="Задача не выбрана"/>
+                </StackPanel>
+            </Border>
+
+            <!---->
+            <!--ВЫПОЛНЯЕМЫЕ/ЗАВЕРШЁННЫЕ ЗАДАЧИ-->
+            <!---->
+            <GroupBox Grid.Row="3"
+                      Header="Выполняемые и завершённые задачи">
+                <DataGrid x:Name="ExecutionGrid"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          GridLinesVisibility="Horizontal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Задача"
+                                            Binding="{Binding TaskName}"
+                                            Width="2*"/>
+                        <DataGridTextColumn Header="Статус"
+                                            Binding="{Binding Status}"
+                                            Width="130"/>
+                        <DataGridTextColumn Header="Начало"
+                                            Binding="{Binding StartTime}"
+                                            Width="140"/>
+                        <DataGridTextColumn Header="Завершение"
+                                            Binding="{Binding EndTime}"
+                                            Width="140"/>
+                        <DataGridTextColumn Header="Результат"
+                                            Binding="{Binding Result}"
+                                            Width="3*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>
