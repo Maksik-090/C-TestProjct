@@ -57,9 +57,7 @@ public class ShellCommandTask : ITask
         }
 
         parameters.TryGetValue("arguments",out var arguments);
-
         parameters.TryGetValue("workingDirectory",out var workingDirectory);
-
 
         try
         {
@@ -67,12 +65,10 @@ public class ShellCommandTask : ITask
             log?.Report($"Команда: {command}");
             if (!string.IsNullOrWhiteSpace(arguments))
             {
-                log?.Report(
-                    $"Аргументы: {arguments}");
+                log?.Report($"Аргументы: {arguments}");
             }
-            string actualWorkingDirectory =string.IsNullOrWhiteSpace(workingDirectory)
-                    ? Environment.CurrentDirectory
-                    : workingDirectory;
+
+            string actualWorkingDirectory = string.IsNullOrWhiteSpace(workingDirectory) ? Environment.CurrentDirectory : workingDirectory;
             log?.Report($"Рабочая папка: {actualWorkingDirectory}");
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -102,7 +98,7 @@ public class ShellCommandTask : ITask
             process.OutputDataReceived += (_, e) =>
             {
                 if (e.Data == null)
-                    return;
+                return;
                 lock (output)
                 {
                     output.Add(e.Data);
@@ -115,13 +111,11 @@ public class ShellCommandTask : ITask
             process.ErrorDataReceived += (_, e) =>
             {
                 if (e.Data == null)
-                    return;
-
+                return;
                 lock (errors)
                 {
                     errors.Add(e.Data);
                 }
-
                 log?.Report($"[ERR] {e.Data}");
             };
 
@@ -140,16 +134,12 @@ public class ShellCommandTask : ITask
                         if (!process.HasExited)
                         {
                             log?.Report("Получен запрос на отмену.");
-
                             log?.Report("Завершение процесса...");
-
                             process.Kill(entireProcessTree: true);
                         }
                     }
                     catch
-                    {
-    
-                    }
+                    { }
                 });
 
             await process.WaitForExitAsync(cancellationToken);
@@ -164,6 +154,7 @@ public class ShellCommandTask : ITask
             {
                 log?.Report("Команда выполнена успешно.");
             }
+
             else
             {
                 log?.Report($"Команда завершилась с кодом {exitCode}.");
@@ -172,9 +163,7 @@ public class ShellCommandTask : ITask
             return new TaskResult
             {
                 IsSuccess = exitCode == 0,
-
                 Message =$"Команда завершена. Код выхода: {exitCode}",
-
                 Data = new
                 {
                     ExitCode = exitCode,
@@ -186,9 +175,7 @@ public class ShellCommandTask : ITask
         catch (OperationCanceledException)
         {
             log?.Report("Выполнение команды было отменено.");
-
             progress?.Report(100);
-
             return new TaskResult
             {
                 IsSuccess = false,

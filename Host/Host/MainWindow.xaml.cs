@@ -48,11 +48,10 @@ public partial class MainWindow : Window
             TasksCountText.Text = $"Задач: {_tasks.Count}";
             StatusText.Text = "Плагины успешно загружены.";
         }
+
         catch (Exception ex)
         {
             StatusText.Text = "Ошибка загрузки плагинов.";
-
-
             MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -68,8 +67,6 @@ public partial class MainWindow : Window
             ClearParameters();
             return;
         }
-
-
         SelectedTaskText.Text =selectedTask.Name;
         RunButton.IsEnabled = true;
         BuildParameterControls(selectedTask.Task);
@@ -85,11 +82,7 @@ public partial class MainWindow : Window
 
         if (task.Parameters.Count == 0)
         {
-            ParametersPanel.Children.Add(new TextBlock
-                {
-                    Text ="Эта задача не требует параметров.",
-                    Margin =new Thickness(5)
-                });
+            ParametersPanel.Children.Add(new TextBlock {Text = "Эта задача не требует параметров.", Margin = new Thickness(5)});
             return;
         }
 
@@ -107,20 +100,13 @@ public partial class MainWindow : Window
             // Название
             var label = new TextBlock
             {
-                Text =
-                    parameter.DisplayName + (parameter.IsRequired ? " *" : ""),
-
+                Text = parameter.DisplayName + (parameter.IsRequired ? " *" : ""),
                 VerticalAlignment = VerticalAlignment.Center,
-
                 Margin = new Thickness(5)
             };
 
-
             Grid.SetRow(label, row);
-
             Grid.SetColumn(label, 0);
-
-
             ParametersPanel.Children.Add(label);
 
 
@@ -137,10 +123,7 @@ public partial class MainWindow : Window
 
             Grid.SetRow(textBox, row);
             Grid.SetColumn(textBox, 1);
-
-
             ParametersPanel.Children.Add(textBox);
-
 
             // Описание
             var description = new TextBlock
@@ -157,7 +140,6 @@ public partial class MainWindow : Window
 
             Grid.SetRow(description,row);
             Grid.SetColumn(description,2);
-
 
             ParametersPanel.Children.Add(description);
             _parameterInputs[parameter.Name] =textBox;
@@ -241,9 +223,7 @@ public partial class MainWindow : Window
                 $"Выполняется: {selectedTask.Name}";
 
             // ПРОГРЕСС
-            var progress =
-                new Progress<double>(
-                    value =>
+            var progress = new Progress<double>(value =>
                     {
                         execution.Progress = Math.Clamp(value,0,100);
                         TaskProgressBar.Value =execution.Progress;
@@ -251,8 +231,7 @@ public partial class MainWindow : Window
                     });
 
             // ЛОГ
-            var log =
-                new Progress<string>(message =>
+            var log = new Progress<string>(message =>
                     {
                         string line =$"[{DateTime.Now:HH:mm:ss}] {message}";
                         if (string.IsNullOrEmpty(execution.Log))
@@ -305,10 +284,7 @@ public partial class MainWindow : Window
             execution.Status = "Ошибка";
             execution.Result = ex.Message;
             execution.EndTime =DateTime.Now.ToString("HH:mm:ss");
-
             StatusText.Text ="Ошибка выполнения задачи.";
-
-
             execution.Log += Environment.NewLine + $"[{DateTime.Now:HH:mm:ss}] Ошибка: {ex.Message}";
         }
         finally
@@ -360,11 +336,11 @@ public partial class MainWindow : Window
     {
         LoadPlugins();
     }
+
     private void ClearHistoryMenuItem_Click(object sender,RoutedEventArgs e)
     {
         _executions.Clear();
         LogTextBox.Clear();
-
         TaskProgressBar.Value = 0;
         TaskProgressText.Text = "0%";
         StatusText.Text ="История выполнения очищена.";

@@ -18,23 +18,14 @@ public class PluginLoader
             return plugins;
         }
 
-        var dllFiles = Directory.GetFiles(
-            pluginsDirectory,
-            "*.dll",
-            SearchOption.TopDirectoryOnly);
+        var dllFiles = Directory.GetFiles(pluginsDirectory, "*.dll",SearchOption.TopDirectoryOnly);
 
         foreach (var dllFile in dllFiles)
         {
             try
             {
                 var assembly = Assembly.LoadFrom(dllFile);
-
-                var pluginTypes = assembly
-                    .GetTypes()
-                    .Where(type =>
-                        typeof(IPlugin).IsAssignableFrom(type) &&
-                        !type.IsInterface &&
-                        !type.IsAbstract);
+                var pluginTypes = assembly.GetTypes().Where(type => typeof(IPlugin).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract);
 
                 foreach (var pluginType in pluginTypes)
                 {
@@ -46,11 +37,9 @@ public class PluginLoader
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Ошибка загрузки плагина {dllFile}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки плагина {dllFile}: {ex.Message}");
             }
         }
-
         return plugins;
     }
 }
